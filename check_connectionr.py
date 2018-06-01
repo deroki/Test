@@ -35,41 +35,47 @@ def try_ssh(site_dict):
     :param site_dict: takes the 'ip' key of the dick key
     :return:
     '''
-    try:
-        ssh_client = paramiko.SSHClient()
-        ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-        ssh_client.connect(hostname=site_dict['ip'],username='admin',password='0r@nge', timeout=30)
+    for i in range(10):
+        try:
+            ssh_client = paramiko.SSHClient()
+            ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
+            ssh_client.connect(hostname=site_dict['ip'],username='admin',password='0r@nge', timeout=30)
 
-        # change ntp server
-        try:
-            sftp = ssh_client.open_sftp()
-            sftp.put("ntp.conf", "/home/admin/ntp.conf")
-            stdin, stdout, stderr = ssh_client.exec_command("sudo mv -f /home/admin/ntp.conf /etc/ntp.conf")
-            stdin, stdout, stderr = ssh_client.exec_command("sudo service ntp restart")
-            stdin, stdout, stderr = ssh_client.exec_command("ntpq -pn")
-            print(stdout.readlines())
+            # change ntp server
+            # try:
+            #     sftp = ssh_client.open_sftp()
+            #     sftp.put("ntp.conf", "/home/admin/ntp.conf")
+            #     stdin, stdout, stderr = ssh_client.exec_command("sudo mv -f /home/admin/ntp.conf /etc/ntp.conf")
+            #     stdin, stdout, stderr = ssh_client.exec_command("sudo service ntp restart")
+            #     stdin, stdout, stderr = ssh_client.exec_command("ntpq -pn")
+            #     print(stdout.readlines())
+            # except Exception as e:
+            #     print(e)
+            #     print("no se pudo cambiar el ntp")
+            # check i2c
+
+            try:
+                stdin, stdout, stderr = ssh_client.exec_command("timeout 5 /usr/sbin/i2cdetect -y 1")
+                stdouttuple = stdout.readlines()
+                pprint.pprint(stdouttuple)
+                print(len(stdouttuple))
+                if len(stdouttuple) < 3:
+                    print("no hay i2c en " + site_dict['site'])
+                    site_dict['i2c'] = False
+                else:
+                    print("hay i2c " + site_dict['site'])
+                    site_dict['i2c'] = True
+
+            except:
+                print("no se puede comprobar i2c")
+                site_dict['i2c'] = "Error"
+                continue
+            # insert in the list ssh
+
         except Exception as e:
-            print(e)
-            print("no se pudo cambiar el ntp")
-        # check i2c
-        try:
-            stdin, stdout, stderr = ssh_client.exec_command("timeout 5 /usr/sbin/i2cdetect -y 1")
-            stdouttuple = stdout.readlines()
-            pprint.pprint(stdouttuple)
-            print(len(stdouttuple))
-            if len(stdouttuple) < 3:
-                print("no hay i2c en " + site_dict['site'])
-                site_dict['i2c'] = False
-            else:
-                print("hay i2c " + site_dict['site'])
-                site_dict['i2c'] = True
-        except:
-            print("no se puede comprobar i2c")
-            site_dict['i2c'] = "Error"
-        # insert in the list ssh
-        devices_up_ssh.append(site_dict)
-    except Exception as e:
-        pass
+            print("Problema ssh")
+            continue
+    devices_up_ssh.append(site_dict)
 
 def ping(site_dict):
     global devices_down
