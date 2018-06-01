@@ -15,6 +15,12 @@ devices_up_ssh = []
 
 
 def listdict_to_csv(listdicts, csvname):
+    '''
+    Take a list of dicst and create a csv with the header of dict keys
+    :param listdicts:
+    :param csvname:
+    :return:
+    '''
     with open(csvname, 'w') as csvfile:
         csv_columns = listdicts[0].keys()
         writer = csv.DictWriter(csvfile, fieldnames = csv_columns, lineterminator='\n' )
@@ -24,6 +30,11 @@ def listdict_to_csv(listdicts, csvname):
 
 
 def try_ssh(site_dict):
+    '''
+
+    :param site_dict: takes the 'ip' key of the dick key
+    :return:
+    '''
     try:
         ssh_client = paramiko.SSHClient()
         ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
@@ -47,13 +58,14 @@ def try_ssh(site_dict):
             pprint.pprint(stdouttuple)
             print(len(stdouttuple))
             if len(stdouttuple) < 3:
-                print("no hay i2c")
+                print("no hay i2c en " + site_dict['site'])
                 site_dict['i2c'] = False
             else:
-                print("hay i2c")
+                print("hay i2c " + site_dict['site'])
                 site_dict['i2c'] = True
         except:
             print("no se puede comprobar i2c")
+            site_dict['i2c'] = "Error"
         # insert in the list ssh
         devices_up_ssh.append(site_dict)
     except Exception as e:
@@ -70,16 +82,18 @@ def ping(site_dict):
     except:
         devices_down += 1
         devices_really_down.append(site_dict)
-        print("Equipos caidos hasta ahora   " + str(devices_down))
+        print("Equipos caidos hasta ahora   " + str(devices_down) + "  " + "con la ip" + site_dict['ip'])
 
 def checkping(sites_list):
     pool_pings = multiprocessing.dummy.Pool(200)
     pool_pings.map(ping, sites_list)
+    pool_pings.close()
+    pool_pings.join()
 
 #--------------------    MAIN ------------------------· #
 
 ip_down_list = []
-
+#------------------- Inputs   -------------------------  #
 # import sqlite3
 # conection = sqlite3.connect("pcr.sqlite")
 # select_all_host = conection.execute("select host from pcr")
@@ -87,24 +101,36 @@ ip_down_list = []
 #     print(host[0])
 #     ip_down_list.append(host[0])
 
+# with open("ipstable.txt", "r") as file:
+#     for line in file:
+#         split_line = line.split('\t')
+#         print(split_line)
+#         if split_line[2] == "Zener":
+#             ip = split_line[1]
+#             site = split_line[0]
+#             site_dict = {"ip" : ip, "site" : site}
+#             ip_down_list.append(site_dict)
+
 with open("ipstable.txt", "r") as file:
     for line in file:
-        split_line = line.split('\t')
-        print(split_line)
-        if split_line[2] == "Zener":
-            ip = split_line[1]
+        try:
+            split_line = line.split('\t')
+            print(split_line)
+            ip = split_line[3]
             site = split_line[0]
             site_dict = {"ip" : ip, "site" : site}
             ip_down_list.append(site_dict)
+        except:
+            print("no se pudo meter la lista de sites")
 
-with open("Caidos.csv", 'r') as csvfile:
-    csvtuple = csv.DictReader(csvfile)
-    for row in csvtuple:
-        site = row['Site']
-        ip = row['IP']
-        site_dict = {'site' : site,
-                     'ip' : ip}
-        ip_down_list.append(site_dict)
+# with open("Caidos1.csv", 'r') as csvfile:
+#     csvtuple = csv.DictReader(csvfile)
+#     for row in csvtuple:
+#         site = row['Site']
+#         ip = row['IP']
+#         site_dict = {'site' : site,
+#                      'ip' : ip}
+#         ip_down_list.append(site_dict)
 
 checkping(ip_down_list)
 print(devices_down)
@@ -117,7 +143,8 @@ print(""" Dispositivos con ping y ssh
 pprint.pprint(devices_up_ssh)
 try:
     listdict_to_csv(devices_up_ssh,"up_n_ssh.csv")
-except:
+except Exception as e:
+    print(e)
     print("no hay nada que meter en el diccionario")
 
 print("totales {}".format(len(devices_up_ssh)))
