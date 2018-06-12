@@ -1,0 +1,97 @@
+CE1005	CE	4	10.226.37.40	1/13/18 0:00	Sat Jan 13 00:00:19	Down	SI	"NO
+"			Tecnico			Dañado	
+CX0437	CX	5	10.226.36.81	1/29/18 2:34	Mon Jan 29 02:28:55	Down	Si	NO			Tecnico			Dañado	
+CX2029	CX	5	10.226.34.42	1/30/18 20:12	Tue Jan 30 20:19:20	Down	NO	NO			Tecnico			Dañado	Botonazo.
+PO6351	PO	5	10.226.34.49	2/16/18 19:47	Fri Feb 16 19:38:35	Down	NO	NO			Tecnico			Dañado	Botonazo.
+AV9404	AV	1	10.226.37.11	3/24/18 4:23	Sat Mar 24 04:25:39	Down	NO	NO			Tecnico			Dañado	
+SS0002	SS	2	10.226.36.120	3/29/18 20:39	Thu Mar 29 20:32:33	Down	NO	NO			Tecnico			Dañado	
+CX0019	CX	5	10.226.36.95	4/10/18 0:02	Tue Apr 10 00:36:31	Down	Si	NO			Tecnico			Dañado	
+GU9103	GU	1	10.226.34.9	4/13/18 12:41	Fri Apr 13 12:36:00	Down	NO	NO			Tecnico			Dañado	PLanificado para atender por  Oscar Centellas  30/05
+LU7860	LU	5	10.226.36.87	4/15/18 0:20	Sun Apr 15 00:06:48	Down	SI	NO							
+OR2801	OR	5	10.226.34.47	4/18/18 23:22	Wed May 23 12:43:21	Down	Si	NO			Tecnico			Sigue caido por actualizacion JAVI	Botonazo.
+LU8508	LU	5	10.226.35.59	4/19/18 19:45	Thu Apr 19 19:41:31	Down	SI	NO							Botonazo.
+CU8562	CU	1	10.226.38.85	4/23/18 19:41	Mon Apr 23 19:37:58	Down	NO	NO			Tecnico			Dañado	Planificamos cambio de PCR con Victor F. 30/05 //Acude Jesus Bonet , pero despues de cambiar PCR, SD y SIm con IP 10.226.42.15 no conseguimos hacerlo funcionar
+MX0112	MX	1	10.226.36.122	4/24/18 15:39	Tue Apr 24 15:35:55	Down	NO	NO			Remoto		1.58	Perdida de latido, conexión OK	
+MX3507	MX	1	10.226.37.1	4/25/18 1:42	Wed Apr 25 01:35:30	Down	SI	NO							
+VX1533	VX	3	10.226.36.203	4/29/18 1:00	Sun Apr 29 01:00:23	Down	SI	NO							
+OX6104	OX	5	10.226.36.159	4/29/18 17:21	Wed May 23 13:27:56	Down	NO	NO			Tecnico			Sigue caido por actualizacion JAVI	Botonazo.
+SE0027	SE	4	10.226.39.31	5/1/18 15:50	Tue May 01 15:46:20	Down	NO	NO			Tecnico			Dañado	
+SG9203	SG	1	10.226.36.238	5/2/18 11:42	Wed May 02 11:38:41	Down	NO	NO			Tecnico			Dañado	
+GR5773	GR	4	10.226.38.74	5/2/18 14:45	Wed May 02 14:48:32	Down	NO	NO			Remoto		1.58	Perdida de latido, conexión OK	
+CO7602	CO	4	10.226.38.173	5/3/18 19:27	Thu May 03 19:27:40	Down	NO	NO			Tecnico			Dañado	
+LU0001	LU	5	10.226.36.105	5/7/18 5:59	Mon May 07 05:50:44	Down	NO	NO			Tecnico			Dañado	
+JX8508	JX	4	10.226.38.183	5/8/18 23:08	Tue May 08 23:08:21	Down	NO	NO			Remoto		1.59	Perdida de latido, conexión OK	
+HX9606	HX	4	10.226.39.36	5/10/18 10:38	Thu May 10 19:14:06	Down	NO	NO			Tecnico			Dañado	
+GU0089	GU	1	10.226.39.153	5/11/18 13:13	Fri May 11 14:01:11	Down	NO	NO						SIN COBERTURA DE ZONA, ES PROBLEMA DE ORANGE	
+MX0184	MX	1	10.226.38.111	5/11/18 13:41	Fri May 11 13:42:37	Down	NO	NO			Tecnico			Dañado	
+SO9836	SO	1	10.226.39.54	5/13/18 4:16	Mon May 21 13:51:01	Down	NO	NO			Tecnico			Dañado	
+TF6028	TF	CAN	10.226.38.40	5/14/18 17:08	Mon May 14 14:56:35	Down	SI	SI	SI					Dañada SD	
+AX6217	AX	3	10.226.36.199	5/14/18 17:51	Mon May 14 17:51:00	Down	SI	NO							
+LE1503	LE	5	10.226.38.167	5/16/18 14:59	Mon May 28 09:29:21	Down	NO	NO			Tecnico			Dañado	"Parece reiniciar o tener mala cobertura
+"
+GU9186	GU	1	10.226.36.7	5/16/18 22:40	Wed May 16 22:36:32	Down	SI	NO							Botonazo.
+GR6015	GR	4	10.226.40.4	5/17/18 14:33	Fri May 18 15:38:36	Down	SI	NO							
+SA5810	SA	1	10.226.39.58	5/17/18 22:06	Mon May 28 02:20:06	Down	SI	NO							
+OX9006	OX	5	10.226.39.149	5/18/18 16:59	Fri May 18 15:01:37	Down	NO	NO			Tecnico			Dañado	
+SA5732	SA	1	10.226.39.64	5/19/18 9:19	Sat May 19 09:17:12	Down	SI	NO							
+AL8767	AL	4	10.226.42.5	5/20/18 18:59	Sun May 27 14:59:42	Down	NO	NO			Remoto			Fallo NGIX	
+CX0906	CX	5	10.226.38.140	5/22/18 14:49	Tue May 22 12:35:05	Down	NO	NO			Tecnico			Dañado	
+MX0441	MX	1	10.226.34.21	5/23/18 9:52	Wed May 23 09:54:01	Down	NO	NO		NO	Tecnico	NO	NO	Desmontado el site, es problema de ORANGE	
+OR9500	OR	5	10.226.34.34	5/23/18 14:07	Wed May 23 14:03:39	Down	NO	NO			Tecnico			Sigue caido por actualizacion JAVI	Botonazo.
+OR9999	OR	5	10.226.34.40	5/24/18 3:13	Thu May 24 03:12:36	Down	NO	NO			Tecnico			Sigue caido por actualizacion JAVI	Botonazo.
+BI0306	BI	2	10.226.35.245	5/24/18 6:36	Thu May 24 06:29:46	Down	NO	NO			Tecnico			Sigue caido por actualizacion JAVI	Botonazo.
+BI0026	BI	2	10.226.35.232	5/24/18 6:36	Thu May 24 06:29:38	Down	NO	NO			Tecnico			Sigue caido por actualizacion JAVI	Botonazo.
+OR9801	OR	5	10.226.34.48	5/24/18 6:36	Thu May 24 06:28:49	Down	NO	NO			Tecnico			Sigue caido por actualizacion JAVI	Botonazo.
+ZX0589	ZX	2	10.226.35.162	5/24/18 6:36	Thu May 24 06:34:53	Down	NO	NO			Tecnico			Sigue caido por actualizacion JAVI	Botonazo.
+OR9270	OR	5	10.226.34.45	5/24/18 6:36	Thu May 24 06:36:56	Down	NO	NO			Tecnico			Sigue caido por actualizacion JAVI	Botonazo.
+VI8621	VI	2	10.226.36.167	5/24/18 6:37	Thu May 24 06:33:14	Down	NO	NO			Tecnico			Sigue caido por actualizacion JAVI	Botonazo.
+BI0301	BI	2	10.226.35.239	5/24/18 6:37	Thu May 24 06:28:20	Down	NO	NO			Tecnico			Sigue caido por actualizacion JAVI	Botonazo.
+AX5407	AX	3	10.226.35.251	5/24/18 6:41	Thu May 24 06:34:54	Down	NO	NO			Tecnico			Sigue caido por actualizacion JAVI	Botonazo.
+SS5460	SS	2	10.226.36.26	5/24/18 6:42	Thu May 24 06:33:06	Down	NO	NO			Tecnico			Sigue caido por actualizacion JAVI	Botonazo.
+SS5806	SS	2	10.226.36.40	5/24/18 6:42	Thu May 24 06:37:15	Down	NO	NO			Tecnico			Sigue caido por actualizacion JAVI	Botonazo.
+CX0420	CX	5	10.226.39.62	5/24/18 6:43	Thu May 24 06:35:47	Down	NO	NO			Tecnico			Sin PING	
+MA2701	MA	4	10.226.39.232	5/24/18 6:50	Thu May 24 06:41:01	Down	NO	NO			Tecnico			Dañado	
+GR5611	GR	4	10.226.39.221	5/24/18 7:03	Wed May 09 03:39:24	Down	NO	NO			Remoto		1.59	Perdida de latido, conexión OK	
+HX9471	HX	4	10.226.38.37	5/24/18 12:05	Thu May 24 11:41:36	Down	SI	NO							
+HX9815	HX	4	10.226.38.103	5/25/18 19:30	Fri May 25 19:26:44	Down	NO	NO			?				
+JX0454	JX	4	10.226.36.104	5/25/18 20:12	Fri May 25 20:05:08	Down	Sí	NO			?				
+OR2401	OR	5	10.226.34.6	5/25/18 23:08	Fri May 25 23:02:45	Down	Si	NO			?			Supuestamente arreglado shutdown	
+LE1817	LE	5	10.226.38.78	5/26/18 4:42	Sat May 26 04:35:19	Down	Si	NO			?				
+GR0000	GR	4	10.226.34.24	5/26/18 7:06	Sat May 26 07:03:56	Down	Si	NO			?			Supuestamente arreglado shutdown, vuevle a caer igualmente	
+SE0356	SE	4	10.226.36.6	5/26/18 7:41	Sat May 26 07:35:30	Down	Si	NO			?			Supuestamente arreglado shutdown, vuevle a caer igualmente	
+CU8491	CU	1	10.226.38.44	5/26/18 7:41	Sat May 26 07:36:47	Down	Si	NO			?				
+SG9125	SG	1	10.226.36.103	5/26/18 9:16	Sat May 26 09:15:46	Down	Si	NO			?				
+AV8603	AV	1	10.226.39.154	5/26/18 10:51	Sat May 26 10:51:48	Down	Si	NO			?				
+TO0114	TO	1	10.226.35.234	5/26/18 18:03	Sat May 26 17:53:45	Down	Si	NO			Tecnico			Sigue caido por actualizacion JAVI. Tras la visita y recuperacion del tecnico vuelle a fallar	
+VA0085	VA	5	10.226.42.35	5/27/18 5:37	Sun May 27 05:31:55	Down	Si	NO			?				
+BA0359	BA	4	10.226.39.184	5/27/18 5:37	Sun May 27 05:34:44	Down	"Si
+"	NO			?				
+SO9786	SO	1	10.226.39.47	5/27/18 20:18	Sun May 27 20:17:14	Down	Si	NO			?				
+SO9844	SO	1	10.226.36.136	5/27/18 20:39	Sun May 27 20:39:40	Down	Si	NO			?			Supuestamente arreglado shutdown	
+VA2243	VA	5	10.226.39.77	5/28/18 0:54	Mon May 28 00:50:20	Down	SI	NO			?				
+OR9050	OR	5	10.226.36.107	5/28/18 2:08	Mon May 28 02:01:55	Down	Si	NO			?				
+CR3044	CR	1	10.226.39.186	5/28/18 3:03	Mon May 28 03:04:03	Down	Si	NO			?				
+CR3110	CR	1	10.226.41.20	5/28/18 3:03	Mon May 28 02:57:28	Down	Si	NO			?				
+TO0219	TO	1	10.226.37.9	5/28/18 3:13	Mon May 28 03:10:46	Down	Si	NO			?				
+CR3003	CR	1	10.226.38.174	5/28/18 3:13	Mon May 28 03:07:55	Down	SI	NO			?				
+CU8474	CU	1	10.226.38.34	5/28/18 3:21	Mon May 28 03:20:41	Down	Si	NO			?				
+LU8140	LU	5	10.226.39.145	5/28/18 5:36	Mon May 28 05:35:05	Down	SI	SI	NO			Javi	1.57	"Web disponible. Dañado i2c
+"	
+CS0004	CS	3	10.226.39.152	5/28/18 5:44	Mon May 28 05:41:52	Down	Si	NO			?				
+CS0041	CS	3	10.226.37.38	5/28/18 6:42	Mon May 28 04:19:17	Down	NO	NO			?				
+OR9728	OR	5	10.226.38.192	4/9/18 3:16	Mon May 28 09:30:02	Down	SI	SI	NO		Remoto	Arancha	1.59	Dañado i2c	
+GU9175	GU	1	10.226.36.251	4/15/18 2:26	Mon May 28 09:29:43	Down	SI	SI	NO		Tecnico	Carlos		Dañado i2c	PLanificado para atender por  Oscar Centellas  30/05
+SE0140	SE	4	10.226.38.54	4/16/18 8:41	Mon May 28 09:29:56	Down	SI	SI	NO		Remoto	Carlos	1.59	Dañado i2c	
+CA5207	CA	4	10.226.38.129	5/4/18 10:29	Mon May 28 09:30:03	Down	SI	SI	NO		Remoto	Carlos	1.59	Dañado i2c	
+MX1064	MX	1	10.226.37.22	5/6/18 1:40	Mon May 28 09:31:35	DOWN	SI	SI	NO		Remoto	Carlos		Dañado i2c	
+SE0197	SE	4	10.226.38.88	5/6/18 20:24	Mon May 28 09:30:34	Down	SI	SI	NO		Remoto	Carlos	1.59	Dañado i2c	
+SA6402	SA	1	10.226.38.142	5/7/18 21:15	Mon May 28 09:30:39	Down	SI	SI	NO		Remoto	Carlos		Dañado i2c	
+LE0010	LE	5	10.226.38.94	5/8/18 4:15	Mon May 28 09:31:42	Down	SI	SI	NO		Remoto	Carlos	1.57	Dañado i2c	
+SE0231	SE	4	10.226.39.34	5/8/18 4:30	Wed May 23 14:27:40	Down	SI	SI	NO		Remoto	Carlos		Dañado i2c	
+BX1528	BX	2	10.226.39.74	5/8/18 10:03	Thu May 24 06:53:07	Down	SI	SI	NO		Remoto	Carlos		Dañado i2c	
+SE1164	SE	4	10.226.38.20	5/12/18 0:09	Mon May 28 09:29:30	Down	SI	SI	NO		Remoto	Carlos		Dañado i2c	
+VX0158	VX	3	10.226.39.242	5/16/18 0:14	Thu May 24 17:17:52	Down	SI	SI	NO		Remoto	Carlos		Dañado i2c	
+OR9722	OR	5	10.226.38.199	5/18/18 21:39	Mon May 28 09:30:11	Down	SI	SI	NO		Remoto	Carlos		Dañado i2c	
+PX0021	PX	5	10.226.39.128	5/28/18 5:21	Mon May 28 09:30:59	Down	SI	SI	NO		Remoto	Carlos		Dañado i2c	
+MX0314	MX	1	10.226.39.40			Down	SI	SI	NO				1.57	Dañado i2c	
+ZA6987	ZA	5	10.226.36.24		Mon May 28 09:28:19	UP	SI	SI	SI	SI	Tecnico	Pepe Avila	1,59	Tiene parche	

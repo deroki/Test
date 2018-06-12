@@ -65,9 +65,9 @@ def try_ssh(site_dict):
                 else:
                     print("hay i2c " + site_dict['site'])
                     site_dict['i2c'] = True
-
+                break
             except:
-                print("no se puede comprobar i2c")
+                print("no se puede comprobar i2c    " + site_dict['site'])
                 site_dict['i2c'] = "Error"
                 continue
             # insert in the list ssh
