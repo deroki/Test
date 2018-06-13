@@ -13,10 +13,11 @@ import dataset
 import time
 from sqlalchemy.exc import IntegrityError
 from collections import OrderedDict
-
+import pysftp
+from types import MethodType
+import shelve
 
 class siteChecker(object):
-
 
     def __init__(self,list_dict_sites = []):
         self.list_dict_sites = list_dict_sites
@@ -54,39 +55,12 @@ class siteChecker(object):
         except:
             return False
 
-    def sshSession(self, ip, user, password, timeout = 30):
-        try:
-            ssh_client = paramiko.SSHClient()
-            ssh_client.set_missing_host_key_policy(paramiko.AutoAddPolicy())
-            ssh_client.connect(hostname= ip, username=user, password=password, timeout=timeout)
-            return ssh_client
-        except:
-            return None
-
-    def i2c_status(self, client):
-        try:
-            stdin, stdout, stderr = client.exec_command("sudo timeout 5 /usr/sbin/i2cdetect -y 1")
-            stdouttuple = stdout.readlines()
-
-            if len(stdouttuple) < 4:
-                return False
-            else:
-                return True
-        except:
-            return "Error"
-
-    def ntp_config(self, client):
-        try:
-            sftp = client.open_sftp()
-            sftp.put("ntp.conf", "/home/admin/ntp.conf")
-            client.exec_command("sudo mv -f /home/admin/ntp.conf /etc/ntp.conf")
-            client.exec_command("sudo service ntp restart")
-            client.exec_command("ntpq -pn")
-            return True
-        except:
-            return "Error"
 
     def runCheck_dict(self,site_list):   # it comes like this --> ('CE1005', {'ip': '10.226.37.40', 'date': '2018-01-12T23:00:37.000Z'})
+        """
+        Takes a nested dict and check some functions on the sites
+        :param site_list:
+        """
         print("checking")
         print(site_list)
         ip = site_list[1]['ip']
@@ -121,7 +95,11 @@ class siteChecker(object):
         self.counter += 1
         print("{} Checked. Quedan {}".format(site, self.totalsites - self.counter))
 
-    def runMultiCheck(self, sites_dict):
+    def runMultiCheck(self, sites_dict, func):
+        '''Takes a nested dict and convert it to a listed list of items and send one by one
+        to the function
+        The functions leaves all in the result variable and return it
+        '''
         self.counter = 0
         self.result = {}
         self.totalsites = len(sites_dict)
@@ -136,7 +114,7 @@ class siteChecker(object):
         #     pool.map(self.runCheck_dict, list(sites_dict.items())[start:end])
         #     pool.close()
         #     pool.join()
-        pool.map(self.runCheck_dict, list(sites_dict.items()))
+        pool.map(func, list(sites_dict.items()))
         pool.close()
         pool.join()
         pprint.pprint(self.result)
@@ -158,6 +136,7 @@ class siteChecker(object):
                 writer.writerow(dict)
 
     def getFromWeb(self):
+        " :returns a nested dict"
         Web_dict = {}
         datatables_url = vars.json_query
         json_response_dict = requests.get(datatables_url).json()
@@ -262,14 +241,18 @@ class siteChecker(object):
         # self.save("test5", self.result)
 
 class sshSession(paramiko.SSHClient):
-    def __init__(self, ip, user, password, timeout = 30):
+    def __init__(self, ip, user, password, site,  timeout = 30):
         super().__init__()
         self.set_missing_host_key_policy(paramiko.AutoAddPolicy())
         self.connect(hostname= ip, username=user, password=password, timeout=timeout)
         self.user = user
         self.ip = ip
+        self.site = site
         self.password = password
         self.timeout = timeout
+        self.sftp = self.open_sftp()
+        self.sftp.put_dir = MethodType(self.MySFTPClient.put_dir, self.sftp)
+        self.sftp.mkdir = MethodType(self.MySFTPClient.mkdir, self.sftp)
     def i2c_status(self):
         try:
             stdin, stdout, stderr = self.exec_command("sudo timeout 5 /usr/sbin/i2cdetect -y 1")
@@ -335,51 +318,59 @@ class sshSession(paramiko.SSHClient):
         Function that change cron with new lines
         :param linebefore: Line that checks if happened before
         :param newcronlines: object
+        :return True-> done
+                False-> not done
         """
-        stdin, stdout, stderr = self.exec_command('crontab -l', timeout=60)
 
-        crontab_out = ''
-        for line in stdout.readlines():
-            if line is not "":
-                crontab_out += line
+        def cronNow():
+            stdin, stdout, stderr = self.exec_command('crontab -l', timeout=60)
+            crontab_out = ''
+            for line in stdout.readlines():
+                if line not in ["\n", ""]:
+                    crontab_out += line
+            return crontab_out
 
         # crontab wrote before?
-        if linebefore in crontab_out:
+        cronnow = cronNow()
+        print('{} cron before is {}'.format(self.site, cronnow))
+        crontab_out = cronnow
+        if linebefore not in crontab_out:
             print("Change need, line {0} wasnt before".format(linebefore))
-        #plug together cronold + newlines
-        new_cron = "{0}\n{1}".format(crontab_out, newcronlines)
-        changecron = '''echo "{0}" > 
-                        /home/{1}/new_cron && crontab 
-                        -u {1} /home/{1}/new_cron 
-                        && sudo service cron restart'''.format(new_cron,self.user)
-        stdin, stdout, stderr = self.exec_command(changecron,timeout=60)
-        crontab_out = ''
-        # crontab out
-        for line in stdout.readlines():
-            if line is not "":
-                crontab_out += line
-        print('Before newcron insertion, this is the stdout {0}'.format(crontab_out))
-        stdin.write(self.password + '\n')
-        stdin.flush()
-        return True
+            #plug together cronold + newlines
+            new_cron = "{0}\n{1}".format(crontab_out, newcronlines)
+            changecron = 'echo "{0}" >  ' \
+                            '/home/{1}/new_cron && crontab  ' \
+                            '-u {1} /home/{1}/new_cron  ' \
+                            '&& sudo service cron restart'.format(new_cron,self.user)
+            stdin, stdout, stderr = self.exec_command(changecron,timeout=60)
+            crontab_out = ''
+            # crontab out
+            for line in stdout.readlines():
+                if line is not "":
+                    crontab_out += line
+            print('''Before newcron insertion, this is the stdout: 
+                    - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                    {0}
+                    - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                    '''.format(crontab_out))
+            stdin.write(self.password + '\n')
+            stdin.flush()
+            print('{} cron after is {}'.format(self.site, cronNow()))
+            return True
+        else:
+            print("Change not need, line was before")
+            return False
 
-
-        # "@reboot sleep 20 && sudo python2.7 /var/www/SmartsiteClient/cron/meta_cron.py &"
-        # "@reboot sleep 20 && sudo python2.7 /var/www/SmartsiteClient/cron/meta_cron.py &\n@reboot sleep {} && sudo reboot now &"
-        # '''echo "@reboot sleep 20 && sudo python2.7 /var/www/SmartsiteClient/cron/meta_cron.py &
-        #
-        # @reboot sleep 21600 && sudo reboot now &" > /home/admin/new_cron && crontab -u admin /home/admin/new_cron '''
-
-    def changeFile(self,filepath,remotefilepath):
+    def changeFile(self,filepath,remotefile):
         filename = filepath.split('/')[-1]
 
         tempfile = "/home/{0}/{1}".format(self.user,filename)
         try:
-            sftp = self.open_sftp()
+
             print("uploading file...")
-            sftp.put(filepath, tempfile)
+            self.sftp.put(filepath, tempfile)
             print("moving file in remote")
-            stdin, stdout, stderr = self.exec_command("sudo mv -f {0} {1}".format(tempfile,remotefilepath))
+            stdin, stdout, stderr = self.exec_command("sudo mv -f {0} {1}".format(tempfile,remotefile))
             print(stdout.readlines())
             #stdin.write(self.password + '\n')
             #stdin.flush()
@@ -387,21 +378,40 @@ class sshSession(paramiko.SSHClient):
             print(e)
             return None
 
-    def put_dir(self, source, targetdir):
-        ''' Uploads the contents of the source directory to the target path. The
-            target directory needs to exists. All subdirectories in source are
-            created under target.
-        '''
-        sftp = self.open_sftp()
+    def put_dir(self, source, target):
 
-        for item in os.listdir(source):
-            if os.path.isfile(os.path.join(source, item)):
-                origin = os.path.join(source, item)
-                targetfile = os.path.join(targetdir,item)
-                sftp.put(origin, targetfile)
-            else:
-                sftp.mkdir('%s/%s' % (target, item), ignore_existing=True)
-                sftp.put_dir(os.path.join(source, item), '%s/%s' % (target, item))
+        self.sftp.put_dir(source,target)
+
+    class MySFTPClient(paramiko.SFTPClient):
+        def put_dir(self, source, target):
+            ''' Uploads the contents of the source directory to the target path. The
+                target directory needs to exists. All subdirectories in source are
+                created under target.
+            '''
+            for item in os.listdir(source):
+                if os.path.isfile(os.path.join(source, item)):
+                    self.put(os.path.join(source, item), '%s/%s' % (target, item))
+                else:
+                    self.mkdir('%s/%s' % (target, item), ignore_existing=True)
+                    self.put_dir(os.path.join(source, item), '%s/%s' % (target, item))
+
+        def mkdir(self, path, mode=511, ignore_existing=False):
+            ''' Augments mkdir by adding an option to not fail if the folder exists  '''
+            try:
+                paramiko.SFTPClient.mkdir(self,path, mode)
+            except IOError:
+                if ignore_existing:
+                    pass
+                else:
+                    raise
+
+        # "@reboot sleep 20 && sudo python2.7 /var/www/SmartsiteClient/cron/meta_cron.py &"
+        # "@reboot sleep 20 && sudo python2.7 /var/www/SmartsiteClient/cron/meta_cron.py &\n@reboot sleep {} && sudo reboot now &"
+        # '''echo "@reboot sleep 20 && sudo python2.7 /var/www/SmartsiteClient/cron/meta_cron.py &
+        #
+        # @reboot sleep 21600 && sudo reboot now &" > /home/admin/new_cron && crontab -u admin /home/admin/new_cron '''
+
+
 
 
 
@@ -422,24 +432,48 @@ if __name__ == "__main__":
         checker = siteChecker()
         checker.Scan('test_5_1')
 
-    def UpdateSafeConn():
-        check = siteChecker()
-        #TODO poner el equipo de prueba de la oficina
-        sitesmad = check.get_from_excel('siteTexts/madridprueba.txt')
-        pprint.pprint(sitesmad)
+    def UpdateSafeConn(nesteddict, name):
+        sites = nesteddict
+        pprint.pprint(sites)
+        with shelve.open('shelve.db','c') as shelf:
+            savedsites = shelf[name]
 
-        sitesmad = {'pruebasite': {'ip' : '192.168.1.1'}}
-        for site in sitesmad.keys():
-            ip = sitesmad[site]['ip']
+            sites = {
+                'pcr3': {'ip' : '10.226.37.21'},
+                'raspberry' : {'ip' : '192.168.1.1'}
+            }
+            # takes a nest dict from text
 
-            ssh = sshSession(ip, 'admin', '0r@nge')
-            ssh.changeFile('files/wvdial.conf','/etc/wvdial.conf')
-            ssh.put_dir('files/ConectivitySafe', '/var/www/SmartsiteClient/DjangoServer/ConectivitySafee')
-            ssh.close()
+            for site in sites.keys():
+
+                print(" - - - - - - - FIXING SITE  {} - - - - - - - ".format(site) )
+                print(" - - - - - - - Getting session  - - - - - - - ")
+                ip = sites[site]['ip']
+                ssh = sshSession(ip, 'admin', '0r@nge', site)
+                #change wvdial file
+                print(" - - - - - - -  Uploading wvdial  - - - - - - - ")
+                ssh.changeFile('files/wvdial.conf','/etc/wvdial.conf')
+                #Upload dir Conectivity Safe
+                print(" - - - - - - -  Uploading Conectivity safe  - - - - - - - ")
+                try:
+                    ssh.sftp.mkdir('/var/www/SmartsiteClient/DjangoServer/ConectivitySafe')
+                except:
+                    print('Puede que la carpeta ya exista')
+                ssh.put_dir('files/ConectivitySafe', '/var/www/SmartsiteClient/DjangoServer/ConectivitySafe')
+                #new cron lines:
+                print(" - - - - - - -  Changing cron  - - - - - - - ")
+                before = '/var/www/SmartsiteClient/DjangoServer/ConectivitySafe/ConectivitySafeModule.py'
+                newcronlines = '''*/5 * * * * sudo python3 /var/www/SmartsiteClient/DjangoServer/ConectivitySafe/ConectivitySafeModule.py &'''
+                ssh.newCron(before, newcronlines )
+
+                shelf[name][site] = True
+                pprint.pprint(shelf[name])
+                input("Press Enter to continue...")
 
 
-
-    UpdateSafeConn()
+    check = siteChecker()
+    sites = check.get_from_excel('siteTexts/madridprueba.txt')
+    UpdateSafeConn('siteTexts/madridprueba.txt')
 
 
 
