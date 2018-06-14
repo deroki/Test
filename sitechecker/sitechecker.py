@@ -16,6 +16,7 @@ from collections import OrderedDict
 import pysftp
 from types import MethodType
 import shelve
+import re
 
 class siteChecker(object):
 
@@ -38,12 +39,14 @@ class siteChecker(object):
             for line in file:
                 try:
                     split_line = line.split('\t')
-                    print(split_line)
                     ip = split_line[3]
                     site = split_line[0]
+                    site = re.search(r'[a-zA-z]{2}\d{4}(-\d)?', split_line[0]).group()
                     site_dict[site] = {'ip' : ip}
                 except:
-                    pass
+                    split_line = line.split('\t')
+                    site = re.search(r'[a-zA-z]{2}\d{4}(-\d)?', split_line[0]).group()
+                    site_dict[site] = {'ip' : ''}
                     #TODO logging no se puede meter en la lista de sites
         return site_dict
 
@@ -72,9 +75,9 @@ class siteChecker(object):
             for intento in range(15):
                 try:
                     try:
-                        ssh = sshSession(ip, "admin", '0r@nge')
+                        ssh = sshSession(ip, "admin", '0r@nge', site)
                     except:
-                        ssh = sshSession(ip, 'pi', 'raspberry')
+                        ssh = sshSession(ip, 'pi', 'raspberry', site)
                     if ssh:
                         check_dict['ssh'] = True
                         check_dict['ntp'] = ssh.ntp_config()
@@ -223,7 +226,7 @@ class siteChecker(object):
             NewDict = {k: v for k, v in NewDict.items() if k.startswith(province)}
         NewDict = list(NewDict.items())[:length]
         NewDict = {k: v for row in NewDict for k, v in NewDict}
-        self.runMultiCheck(NewDict)
+        self.runMultiCheck(NewDict, self.runCheck_dict)
         NewDict = self.result
         DbDict = self.GetTable(table)
         FinalDict = self.CompareDicts(DbDict, NewDict, ['ssh', 'alive','i2c'])
@@ -346,16 +349,23 @@ class sshSession(paramiko.SSHClient):
             crontab_out = ''
             # crontab out
             for line in stdout.readlines():
+
                 if line is not "":
                     crontab_out += line
-            print('''Before newcron insertion, this is the stdout: 
-                    - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
-                    {0}
-                    - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+            print('''
+Before newcron insertion, this is the stdout: 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+{0}
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
                     '''.format(crontab_out))
             stdin.write(self.password + '\n')
             stdin.flush()
-            print('{} cron after is {}'.format(self.site, cronNow()))
+            print('''
+{} cron after is 
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+{}
+- - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - - -
+                '''.format(self.site, cronNow()))
             return True
         else:
             print("Change not need, line was before")
@@ -411,7 +421,13 @@ class sshSession(paramiko.SSHClient):
         #
         # @reboot sleep 21600 && sudo reboot now &" > /home/admin/new_cron && crontab -u admin /home/admin/new_cron '''
 
+def checkprueba():
+    dict_text = {"orange": {'ip': "10.226.37.21"},
+                 'le1738': {'ip': '10.226.38.49'},
+                 'SE0027': {'ip': '10.226.39.31'}}
 
+    checker = siteChecker()
+    checker.Scan('test_5_1')
 
 
 
@@ -424,56 +440,90 @@ if __name__ == "__main__":
     # #dictsites = mychecker.get_from_excel("ipstable.txt")
     # mychecker.runMultiCheck2(dictsites)
     # print(mychecker.result)
-    def checkprueba():
-        dict_text = {"orange" : {'ip': "10.226.37.21"},
-                'le1738' : {'ip' : '10.226.38.49'},
-                'SE0027' : {'ip' : '10.226.39.31'}}
 
-        checker = siteChecker()
-        checker.Scan('test_5_1')
 
     def UpdateSafeConn(nesteddict, name):
         sites = nesteddict
         pprint.pprint(sites)
-        with shelve.open('shelve.db','c') as shelf:
-            savedsites = shelf[name]
+        with shelve.open('name','c') as shelf:
+            try:
+                savedsites = shelf[name]
+            except KeyError:
+                print('No hay datos anteriores')
+                pass
+            while(True):
+                for site in sites.keys():
+                    try:
+                        if shelf[site] != True:
+                            print("{} not done before".format(site))
+                            # input("Press Enter to continue...")
+                            pass
+                        else:
+                            print("{} done yet".format(site))
+                            continue
+                    except Exception as e:
+                        # input("Press Enter to continue...")
+                        print('{} not done before'.format(site))
+                        pass
 
-            sites = {
-                'pcr3': {'ip' : '10.226.37.21'},
-                'raspberry' : {'ip' : '192.168.1.1'}
-            }
-            # takes a nest dict from text
+                    try:
+                        print(" - - - - - - - FIXING SITE  {} - - - - - - - ".format(site) )
+                        print(" - - - - - - - Getting session  - - - - - - - ")
+                        ip = sites[site]['ip']
+                        try:
+                            ssh = sshSession(ip, 'admin', '0r@nge', site, 60)
+                        except:
+                            try:
+                                print('Old prototype with old password trying..')
+                                ssh = sshSession(ip, 'pi', 'raspberry', site, 60)
+                            except:
+                                print("equipo sin conexión por ssh")
+                                continue
+                        #change wvdial file
+                        print(" - - - - - - -  Uploading wvdial  - - - - - - - ")
+                        ssh.changeFile('files/wvdial.conf','/etc/wvdial.conf')
+                        #Upload dir Conectivity Safe
+                        print(" - - - - - - -  Uploading Conectivity safe  - - - - - - - ")
+                        try:
+                            ssh.sftp.mkdir('/var/www/SmartsiteClient/DjangoServer/ConectivitySafe')
+                            ssh.put_dir('files/ConectivitySafe', '/var/www/SmartsiteClient/DjangoServer/ConectivitySafe')
+                        except:
+                            print('Puede que la carpeta ya exista')
+                        #new cron lines:
+                        print(" - - - - - - -  Changing cron  - - - - - - - ")
+                        before = '/var/www/SmartsiteClient/DjangoServer/ConectivitySafe/ConectivitySafeModule.py'
+                        newcronlines = '''*/5 * * * * sudo python3 /var/www/SmartsiteClient/DjangoServer/ConectivitySafe/ConectivitySafeModule.py &'''
 
-            for site in sites.keys():
-
-                print(" - - - - - - - FIXING SITE  {} - - - - - - - ".format(site) )
-                print(" - - - - - - - Getting session  - - - - - - - ")
-                ip = sites[site]['ip']
-                ssh = sshSession(ip, 'admin', '0r@nge', site)
-                #change wvdial file
-                print(" - - - - - - -  Uploading wvdial  - - - - - - - ")
-                ssh.changeFile('files/wvdial.conf','/etc/wvdial.conf')
-                #Upload dir Conectivity Safe
-                print(" - - - - - - -  Uploading Conectivity safe  - - - - - - - ")
-                try:
-                    ssh.sftp.mkdir('/var/www/SmartsiteClient/DjangoServer/ConectivitySafe')
-                except:
-                    print('Puede que la carpeta ya exista')
-                ssh.put_dir('files/ConectivitySafe', '/var/www/SmartsiteClient/DjangoServer/ConectivitySafe')
-                #new cron lines:
-                print(" - - - - - - -  Changing cron  - - - - - - - ")
-                before = '/var/www/SmartsiteClient/DjangoServer/ConectivitySafe/ConectivitySafeModule.py'
-                newcronlines = '''*/5 * * * * sudo python3 /var/www/SmartsiteClient/DjangoServer/ConectivitySafe/ConectivitySafeModule.py &'''
-                ssh.newCron(before, newcronlines )
-
-                shelf[name][site] = True
-                pprint.pprint(shelf[name])
-                input("Press Enter to continue...")
+                        ssh.newCron(before, newcronlines )
+                        shelf[site] = True
+                        break
+                    except:
+                        continue
 
 
+
+    # sites = {
+    #         'pcr3': {'ip': '10.226.37.21'},
+    #         'raspberry': {'ip': '192.168.1.1'},
+    #         'MX3304' : {'ip' : '10.226.38.163'},
+    #         'MX0136': {'ip': '10.226.35.218'},
+    #         'MX0563': {'ip': '10.226.35.254'},
+    #         'MX0913': {'ip': '10.226.34.78'}
+    #     }
     check = siteChecker()
+    all_sites = check.getFromWeb()
     sites = check.get_from_excel('siteTexts/madridprueba.txt')
-    UpdateSafeConn('siteTexts/madridprueba.txt')
+    print("sitesdeltexto")
+    pprint.pprint(sites)
+    sites_ip = {}
+    for site in sites.keys():
+        try:
+            sites_ip[site] = all_sites[site]
+        except KeyError:
+            print('el site {} no está en la lista total'.format(site))
+    print("sites_ip")
+    pprint.pprint(sites_ip)
+    UpdateSafeConn(sites_ip,'test')
 
 
 
